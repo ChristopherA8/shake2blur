@@ -1,6 +1,8 @@
 @interface SBHomeScreenBackdropView : UIView
 @end
 
+
+
 @interface ShakeBlurView : UIVisualEffectView
 +(instancetype)sharedInstance;
 -(void)unblur;
@@ -55,7 +57,26 @@ int i = 0;
 }
 %end
 
+// @interface BlurPresenter : NSObject
+// @property (strong, nonatomic) UIWindow *blurWindow;
+// -(void)presentWindow;
+// @end
+
+// @implementation BlurPresenter
+// -(void)presentWindow {
+// 	self.blurWindow = [[UIWindow alloc] initWithFrame:CGRectMake(0,0,200,200)];
+// 	self.blurWindow.windowLevel = UIWindowLevelAlert + 1.0;
+// 	[self.blurWindow makeKeyAndVisible];
+
+// 	[[%c(ShakeBlurView) sharedInstance] setFrame:[self.blurWindow frame]];
+// 	[[%c(ShakeBlurView) sharedInstance] setAlpha:0.0];
+// 	[self.blurWindow addSubview:[%c(ShakeBlurView) sharedInstance]];
+// }
+// @end
+
+
 %hook UIWindow
+
 // Toggle blur on shake
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
     %orig;
