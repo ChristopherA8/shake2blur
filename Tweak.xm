@@ -16,7 +16,7 @@
 	dispatch_once(&onceToken, ^{
 		if (@available(iOS 13, *)) {
 			UIBlurEffect *blur;
-			blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemUltraThinMaterial];
+			blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial];
 			sharedInstance = [[ShakeBlurView alloc] initWithEffect:blur];
 		}
 	});
@@ -30,7 +30,6 @@
 }
 @end
 
-
 // Function to toggle the blur effect alpha
 BOOL blurred = NO;
 void toggleBlur() {
@@ -43,45 +42,17 @@ void toggleBlur() {
 	}
 }
 
-// Temporary blur test, this will move to somewhere else
-int i = 0;
-%hook SBHomeScreenBackdropView
--(void)layoutSubviews {
-	%orig;
-	if (i == 0) {
-		[[%c(ShakeBlurView) sharedInstance] setFrame:self.bounds];
-		[[%c(ShakeBlurView) sharedInstance] setAlpha:0.0];
-		[self addSubview:[%c(ShakeBlurView) sharedInstance]];
-	i++;
-	}
-}
-%end
-
-// @interface BlurPresenter : NSObject
-// @property (strong, nonatomic) UIWindow *blurWindow;
-// -(void)presentWindow;
-// @end
-
-// @implementation BlurPresenter
-// -(void)presentWindow {
-// 	self.blurWindow = [[UIWindow alloc] initWithFrame:CGRectMake(0,0,200,200)];
-// 	self.blurWindow.windowLevel = UIWindowLevelAlert + 1.0;
-// 	[self.blurWindow makeKeyAndVisible];
-
-// 	[[%c(ShakeBlurView) sharedInstance] setFrame:[self.blurWindow frame]];
-// 	[[%c(ShakeBlurView) sharedInstance] setAlpha:0.0];
-// 	[self.blurWindow addSubview:[%c(ShakeBlurView) sharedInstance]];
-// }
-// @end
-
-
 %hook UIWindow
-
 // Toggle blur on shake
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
     %orig;
     if(event.type == UIEventSubtypeMotionShake && self == [[UIApplication sharedApplication] keyWindow]) {
+		[[%c(ShakeBlurView) sharedInstance] setFrame:[self frame]];
+		[[%c(ShakeBlurView) sharedInstance] setAlpha:0.0];
+		[[[UIApplication sharedApplication] keyWindow].rootViewController.view insertSubview:[%c(ShakeBlurView) sharedInstance] atIndex:100];
         toggleBlur();
     }
 }
 %end
+
+
