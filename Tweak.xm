@@ -1,13 +1,10 @@
-@interface SBHomeScreenBackdropView : UIView
-@end
-
-
-
 @interface ShakeBlurView : UIVisualEffectView
 +(instancetype)sharedInstance;
 -(void)unblur;
 -(void)blur;
 @end
+
+BOOL blurred = NO;
 
 @implementation ShakeBlurView
 +(instancetype)sharedInstance {
@@ -16,22 +13,31 @@
 	dispatch_once(&onceToken, ^{
 		if (@available(iOS 13, *)) {
 			UIBlurEffect *blur;
-			blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial];
+			blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
 			sharedInstance = [[ShakeBlurView alloc] initWithEffect:blur];
+
+			[sharedInstance setFrame:[[UIScreen mainScreen] bounds]];
+			[sharedInstance setAlpha:0.0];
 		}
 	});
 	return sharedInstance;
 }
+
 -(void)unblur {
-	[[%c(ShakeBlurView) sharedInstance] setAlpha:0];
+	[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+		[[%c(ShakeBlurView) sharedInstance] setAlpha:0.0];
+    } completion:nil];
 }
+
 -(void)blur {
-	[[%c(ShakeBlurView) sharedInstance] setAlpha:1];
+	[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+		[[%c(ShakeBlurView) sharedInstance] setAlpha:1.0];
+    } completion:nil];
 }
+
 @end
 
 // Function to toggle the blur effect alpha
-BOOL blurred = NO;
 void toggleBlur() {
 	if (!blurred){
 		[[%c(ShakeBlurView) sharedInstance] blur];
@@ -47,10 +53,8 @@ void toggleBlur() {
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
     %orig;
     if(event.type == UIEventSubtypeMotionShake && self == [[UIApplication sharedApplication] keyWindow]) {
-		[[%c(ShakeBlurView) sharedInstance] setFrame:[self frame]];
-		[[%c(ShakeBlurView) sharedInstance] setAlpha:0.0];
-		[[[UIApplication sharedApplication] keyWindow].rootViewController.view insertSubview:[%c(ShakeBlurView) sharedInstance] atIndex:100];
-        toggleBlur();
+		[[[UIApplication sharedApplication] keyWindow].rootViewController.view insertSubview:[%c(ShakeBlurView) sharedInstance] atIndex:1000];
+		toggleBlur();
     }
 }
 %end

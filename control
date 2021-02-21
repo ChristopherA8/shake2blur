@@ -1,6 +1,6 @@
 Package: com.chr1s.shake2blur
 Name: Shake2Blur
-Version: 0.0.1
+Version: 1.0.0
 Architecture: iphoneos-arm
 Description: Shake to blur phone screen
 Maintainer: Chr1s
