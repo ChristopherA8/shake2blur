@@ -1,3 +1,3 @@
 # shake2blur
 
-Shake phone to blur screen - WIP
+Shake phone to blur screen
